@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+// オリジナルウィジェット
+import 'barcode/barcode.dart';
+
 // provider変数
 import '../provider/counterProvider.dart';
+import '../provider/barcodeProvider.dart';
 
 
 // --- メイン関数 ---
@@ -26,6 +30,8 @@ class countUpDemo extends ConsumerWidget {
 
     final conuntNum = ref.watch(countUpProvider);
 
+
+
     return Scaffold(
       // --- ヘッダー部分 ---
       appBar: AppBar(
@@ -48,6 +54,36 @@ class countUpDemo extends ConsumerWidget {
                 color: Colors.black, 
                 fontSize: 24,
               ),
+            ),
+
+            SizedBox(height: 20,),
+            
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const barcodeWidget()),
+                );
+              },
+              child: const Text('送信'),
+            ),
+
+            SizedBox(height: 40,),
+
+            Text("====== 以下、Want宿題用 ======"),
+
+            SizedBox(height: 20,),
+
+            ElevatedButton(
+              onPressed: () {
+                // バーコード値をクリア
+                ref.read(barcodeValueProvider.notifier).state = null;
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const barcodeWidget()),
+                );
+              },
+              child: const Text('バーコード読取へ'),
             ),
           ],
         ),
