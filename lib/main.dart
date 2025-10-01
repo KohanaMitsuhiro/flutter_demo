@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert'; // jsonを使用するのに用いている
 
 // オリジナルウィジェット
 import 'barcode/barcode.dart';
@@ -29,7 +31,7 @@ class countUpDemo extends ConsumerWidget {
   Widget build(BuildContext context,WidgetRef ref) {
 
     final conuntNum = ref.watch(countUpProvider);
-
+    final res = ref.watch(responseProvider);
 
 
     return Scaffold(
@@ -60,14 +62,18 @@ class countUpDemo extends ConsumerWidget {
             
             ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const barcodeWidget()),
-                );
+                // カウントアップの数値を送る
+                final res = sendCount(conuntNum);
+                res.then((value) {
+                  ref.read(responseProvider.notifier).state = value;
+                });
               },
               child: const Text('送信'),
             ),
 
+            if(res != null) 
+              Text("結果: $res"),
+            
             SizedBox(height: 40,),
 
             Text("====== 以下、Want宿題用 ======"),
@@ -100,7 +106,27 @@ class countUpDemo extends ConsumerWidget {
           tooltip: 'Increment',
           child: const Icon(Icons.add),
         ), 
-
     );
   }
+}
+
+
+// httpリクエスト関数
+// --- backend
+const baseUrl = "localhost:8000"; // backendのURL
+
+Future<String> sendCount(int count) async {
+  final url = Uri.http(baseUrl, '/count', {'value': count.toString()});
+  try {
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data['result'];
+    } else {
+      return "${response.statusCode}";
+    }
+  } catch (e) {
+    return "エラー！";
+  }
+  
 }
