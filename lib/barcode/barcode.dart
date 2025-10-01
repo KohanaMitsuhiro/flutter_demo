@@ -7,7 +7,6 @@ import 'barcode_read.dart';
 // provider変数
 import '../provider/barcodeProvider.dart';
 
-
 class barcodeWidget extends ConsumerWidget {
   const barcodeWidget({super.key});
 
